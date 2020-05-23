@@ -1,4 +1,30 @@
+import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
+
+
+class AppProvider with ChangeNotifier {
+  ThemeData _themeData;
+  String _date;
+
+  AppProvider(Box app){
+    this._themeData = app.get('is_dark', defaultValue: false) ? darkTheme : lightTheme;
+    this._date =  DateTime.now().toString();
+  }
+
+  ThemeData get theme => _themeData;
+  String get date => _date;
+
+  void setTheme(ThemeData themeData){
+    this._themeData = themeData;
+    notifyListeners();
+  }
+
+  void setDate(String date){
+    this._date = date;
+    notifyListeners();
+  }
+  
+}
 
 final darkTheme = ThemeData(
   scaffoldBackgroundColor: Color(0xFF030304),
@@ -18,8 +44,6 @@ final darkTheme = ThemeData(
   accentIconTheme: IconThemeData(color: Colors.black),
   dividerColor: Colors.black12,
 );
-
-
 
 final lightTheme = ThemeData(
   primaryTextTheme: TextTheme(

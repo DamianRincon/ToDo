@@ -1,42 +1,45 @@
-import 'package:ToDo/src/pages/home/home_page.dart';
-import 'package:ToDo/src/pages/onboarding/onboarding_page.dart';
-import 'package:ToDo/src/provider/theme_data.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ToDo/src/util/sys.dart';
+import 'package:flutter/foundation.dart';
+import 'package:ToDo/src/model/task.dart';
+import 'package:ToDo/src/model/trash.dart';
+import 'package:ToDo/src/view/main_page.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:ToDo/src/provider/theme_provider.dart';
+import 'package:ToDo/src/provider/app_provider.dart';
 
-void main() async{
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var dir = await getApplicationDocumentsDirectory();
-  if(Sys.isWeb)
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    //statusBarIconBrightness: Brightness.light
+  ));
+  if(kIsWeb)
     Hive.init(dir.path);
   else
     await Hive.initFlutter(dir.path);
 
-  await Hive.openBox('settings');
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent
-  ));
-  
-  var settings = Hive.box('settings');
-  print(settings.get('dark_mode'));
+  Hive.registerAdapter(TaskAdapter());
+  Hive.registerAdapter(TrashAdapter());
+  await Hive.openBox('app');
+  await Hive.openBox('trash');
+  await Hive.openBox('task');
+  Box app = Hive.box('app');
 
   runApp(
-    Provider(
-      create: (_) => ThemeProvider(),
+    MultiProvider(  
+      providers: [
+        ChangeNotifierProvider(create: (context) => AppProvider(app)),
+      ],
       child: MaterialApp(
-        title: "ToDo List App",
+        title: "ToDo List",
         debugShowCheckedModeBanner: true,
-        locale: Locale(settings.get('locale', defaultValue: Sys.locale)),
-        theme: settings.get('dark_mode', defaultValue: false) ? darkTheme : lightTheme,
-        home: settings.get('home', defaultValue: true) ? HomePage() : OnboardingPage(),
+        theme: app.get('dark_mode', defaultValue: false) ? darkTheme : lightTheme,
+        home: MainPage(),
       )
     )
   );
-
 }

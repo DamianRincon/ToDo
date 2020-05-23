@@ -1,6 +1,6 @@
-import 'package:ToDo/src/pages/home/task_page.dart';
-import 'package:ToDo/src/pages/home/trash_page.dart';
-import 'package:ToDo/src/widget/drawer_item.dart';
+import '../home/task_page.dart';
+import '../home/trash_page.dart';
+import '../../widget/drawer_item.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -27,13 +27,14 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("ToDo List App"),
+        title: Text("ToDo"),
         centerTitle: true,
       ),
+      
       drawer: Drawer(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(8),
-          child: Column(
+          child: Column(      
             children: <Widget>[
               Container(
                 height: 100,
